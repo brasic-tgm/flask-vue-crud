@@ -2,48 +2,42 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-10">
-        <h1>Books</h1>
+        <h1>Todos</h1>
         <hr><br><br>
         <alert :message=message v-if="showMessage"></alert>
-        <button type="button" class="btn btn-success btn-sm" v-b-modal.book-modal>Add Book</button>
+        <button type="button" class="btn btn-success btn-sm" v-b-modal.todo-modal>Add Todo</button>
         <br><br>
 
-        <!-- books table -->
+        <!-- todos table -->
         <table class="table table-hover">
           <thead>
             <tr>
-              <th scope="col">Title</th>
+              <th scope="col">Todo</th>
               <th scope="col">Author</th>
-              <th scope="col">Read?</th>
-              <th scope="col">Purchase Price</th>
+              <th scope="col">Done?</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(book, index) in books" :key="index">
-              <td>{{ book.title }}</td>
-              <td>{{ book.author }}</td>
+            <tr v-for="(todo, index) in todos" :key="index">
+              <td>{{ todo.todo }}</td>
+              <td>{{ todo.assignee }}</td>
               <td>
-                <span v-if="book.read">Yes</span>
+                <span v-if="todo.done">Yes</span>
                 <span v-else>No</span>
               </td>
-              <td>${{ book.price }}</td>
               <td>
                 <button type="button"
                         class="btn btn-warning btn-sm"
-                        v-b-modal.book-update-modal
-                        @click="editBook(book)">
+                        v-b-modal.todo-update-modal
+                        @click="editTodo(todo)">
                     Update
                 </button>
                 <button type="button"
                         class="btn btn-danger btn-sm"
-                        @click="onDeleteBook(book)">
+                        @click="onDeleteTodo(todo)">
                     Delete
                 </button>
-                <router-link :to="`/order/${book.id}`"
-                             class="btn btn-primary btn-sm">
-                    Purchase
-                </router-link>
               </td>
             </tr>
           </tbody>
@@ -52,45 +46,37 @@
       </div>
     </div>
 
-    <!-- add book modal -->
-    <b-modal ref="addBookModal"
-             id="book-modal"
-            title="Add a new book"
+    <!-- add todo modal -->
+    <b-modal ref="addTodoModal"
+             id="todo-modal"
+            todo="Add a new todo"
             hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-        <b-form-group id="form-title-group"
-                      label="Title:"
-                      label-for="form-title-input">
-            <b-form-input id="form-title-input"
+        <b-form-group id="form-todo-group"
+                      label="Todo:"
+                      label-for="form-todo-input">
+            <b-form-input id="form-todo-input"
                           type="text"
-                          v-model="addBookForm.title"
+                          v-model="addTodoForm.todo"
                           required
-                          placeholder="Enter title">
+                          placeholder="Enter todo">
             </b-form-input>
         </b-form-group>
-        <b-form-group id="form-author-group"
+        <b-form-group id="form-assignee-group"
                       label="Author:"
-                      label-for="form-author-input">
-          <b-form-input id="form-author-input"
+                      label-for="form-assignee-input">
+          <b-form-input id="form-assignee-input"
                         type="text"
-                        v-model="addBookForm.author"
+                        v-model="addTodoForm.assignee"
                         required
-                        placeholder="Enter author">
+                        placeholder="Enter assignee">
           </b-form-input>
         </b-form-group>
-        <b-form-group id="form-price-group"
-                      label="Purchase price:"
-                      label-for="form-price-input">
-          <b-form-input id="form-price-input"
-                        type="number"
-                        v-model="addBookForm.price"
-                        required
-                        placeholder="Enter price">
-          </b-form-input>
+
         </b-form-group>
-        <b-form-group id="form-read-group">
-            <b-form-checkbox-group v-model="addBookForm.read" id="form-checks">
-              <b-form-checkbox value="true">Read?</b-form-checkbox>
+        <b-form-group id="form-done-group">
+            <b-form-checkbox-group v-model="addTodoForm.done" id="form-checks">
+              <b-form-checkbox value="true">Done?</b-form-checkbox>
             </b-form-checkbox-group>
         </b-form-group>
         <b-button type="submit" variant="primary">Submit</b-button>
@@ -98,44 +84,34 @@
       </b-form>
     </b-modal>
 
-    <b-modal ref="editBookModal"
-             id="book-update-modal"
-             title="Update"
+    <b-modal ref="editTodoModal"
+             id="todo-update-modal"
+             todo="Update"
              hide-footer>
       <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
-        <b-form-group id="form-title-edit-group"
-                      label="Title:"
-                      label-for="form-title-edit-input">
-          <b-form-input id="form-title-edit-input"
+        <b-form-group id="form-todo-edit-group"
+                      label="Todo:"
+                      label-for="form-todo-edit-input">
+          <b-form-input id="form-todo-edit-input"
                         type="text"
-                        v-model="editForm.title"
+                        v-model="editForm.todo"
                         required
-                        placeholder="Enter title">
+                        placeholder="Enter todo">
           </b-form-input>
         </b-form-group>
-        <b-form-group id="form-author-edit-group"
+        <b-form-group id="form-assignee-edit-group"
                       label="Author:"
-                      label-for="form-author-edit-input">
-          <b-form-input id="form-author-edit-input"
+                      label-for="form-assignee-edit-input">
+          <b-form-input id="form-assignee-edit-input"
                         type="text"
-                        v-model="editForm.author"
+                        v-model="editForm.assignee"
                         required
-                        placeholder="Enter author">
+                        placeholder="Enter assignee">
           </b-form-input>
         </b-form-group>
-        <b-form-group id="form-price-edit-group"
-                      label="Purchase price:"
-                      label-for="form-price-edit-input">
-          <b-form-input id="form-price-edit-input"
-                        type="number"
-                        v-model="editForm.price"
-                        required
-                        placeholder="Enter price">
-          </b-form-input>
-        </b-form-group>
-        <b-form-group id="form-read-edit-group">
-          <b-form-checkbox-group v-model="editForm.read" id="form-checks">
-            <b-form-checkbox value="true">Read?</b-form-checkbox>
+        <b-form-group id="form-done-edit-group">
+          <b-form-checkbox-group v-model="editForm.done" id="form-checks">
+            <b-form-checkbox value="true">Done?</b-form-checkbox>
           </b-form-checkbox-group>
         </b-form-group>
         <b-button type="submit" variant="primary">Update</b-button>
@@ -152,19 +128,17 @@ import Alert from './Alert';
 export default {
   data() {
     return {
-      books: [],
-      addBookForm: {
-        title: '',
-        author: '',
-        read: [],
-        price: '',
+      todos: [],
+      addTodoForm: {
+        todo: '',
+        assignee: '',
+        done: []
       },
       editForm: {
         id: '',
-        title: '',
-        author: '',
-        read: [],
-        price: '',
+        todo: '',
+        assignee: '',
+        done: []
       },
       message: '',
       showMessage: false,
@@ -174,117 +148,114 @@ export default {
     alert: Alert,
   },
   methods: {
-    getBooks() {
-      const path = 'http://localhost:5000/books';
+    getTodos() {
+      const path = 'http://localhost:8080/todos';
       axios.get(path)
         .then((res) => {
-          this.books = res.data.books;
+          this.todos = res.data.todos;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
         });
     },
-    addBook(payload) {
-      const path = 'http://localhost:5000/books';
+    addTodo(payload) {
+      const path = 'http://localhost:8080/todos';
       axios.post(path, payload)
         .then(() => {
-          this.getBooks();
-          this.message = 'Book added!';
+          this.getTodos();
+          this.message = 'Todo added!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
-          this.getBooks();
+          this.getTodos();
         });
     },
-    updateBook(payload, bookID) {
-      const path = `http://localhost:5000/books/${bookID}`;
+    updateTodo(payload, todoID) {
+      const path = `http://localhost:8080/todos/${todoID}`;
       axios.put(path, payload)
         .then(() => {
-          this.getBooks();
-          this.message = 'Book updated!';
+          this.getTodos();
+          this.message = 'Todo updated!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
-          this.getBooks();
+          this.getTodos();
         });
     },
-    removeBook(bookID) {
-      const path = `http://localhost:5000/books/${bookID}`;
+    removeTodo(todoID) {
+      const path = `http://localhost:8080/todos/${todoID}`;
       axios.delete(path)
         .then(() => {
-          this.getBooks();
-          this.message = 'Book removed!';
+          this.getTodos();
+          this.message = 'Todo removed!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
-          this.getBooks();
+          this.getTodos();
         });
     },
     initForm() {
-      this.addBookForm.title = '';
-      this.addBookForm.author = '';
-      this.addBookForm.read = [];
-      this.addBookForm.price = '';
+      this.addTodoForm.todo = '';
+      this.addTodoForm.assignee = '';
+      this.addTodoForm.done = [];
       this.editForm.id = '';
-      this.editForm.title = '';
-      this.editForm.author = '';
-      this.editForm.read = [];
+      this.editForm.todo = '';
+      this.editForm.assignee = '';
+      this.editForm.done = [];
       this.editForm.id = '';
     },
     onSubmit(evt) {
       evt.preventDefault();
-      this.$refs.addBookModal.hide();
-      let read = false;
-      if (this.addBookForm.read[0]) read = true;
+      this.$refs.addTodoModal.hide();
+      let done = false;
+      if (this.addTodoForm.done[0]) done = true;
       const payload = {
-        title: this.addBookForm.title,
-        author: this.addBookForm.author,
-        read, // property shorthand
-        price: this.addBookForm.price,
+        todo: this.addTodoForm.todo,
+        assignee: this.addTodoForm.assignee,
+        done // property shorthand
       };
-      this.addBook(payload);
+      this.addTodo(payload);
       this.initForm();
     },
     onSubmitUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editBookModal.hide();
-      let read = false;
-      if (this.editForm.read[0]) read = true;
+      this.$refs.editTodoModal.hide();
+      let done = false;
+      if (this.editForm.done[0]) done = true;
       const payload = {
-        title: this.editForm.title,
-        author: this.editForm.author,
-        read, // property shorthand
-        price: this.editForm.price,
+        todo: this.editForm.todo,
+        assignee: this.editForm.assignee,
+        done // property shorthand
       };
-      this.updateBook(payload, this.editForm.id);
+      this.updateTodo(payload, this.editForm.id);
     },
     onReset(evt) {
       evt.preventDefault();
-      this.$refs.addBookModal.hide();
+      this.$refs.addTodoModal.hide();
       this.initForm();
     },
     onResetUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editBookModal.hide();
+      this.$refs.editTodoModal.hide();
       this.initForm();
-      this.getBooks(); // why?
+      this.getTodos(); // why?
     },
-    onDeleteBook(book) {
-      this.removeBook(book.id);
+    onDeleteTodo(todo) {
+      this.removeTodo(todo.id);
     },
-    editBook(book) {
-      this.editForm = book;
+    editTodo(todo) {
+      this.editForm = todo;
     },
   },
   created() {
-    this.getBooks();
+    this.getTodos();
   },
 };
 </script>
